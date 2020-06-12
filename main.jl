@@ -27,6 +27,7 @@ function classify(distances::Array{Float64, 1}, labels::Array{T, 1}, k::Int64) w
         for i in 1:nc
             if klabels[j] == class[i]
                 class_count[i] += 1
+                break
             end
         end
     end

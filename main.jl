@@ -1,6 +1,18 @@
 using Random
 
 ################################################################################
+function Normalization(I::Array{T, 2}) where {T<:Number}
+    FN = size(I, 2)
+    for i in 1:FN
+        Low, LowIndex = findmin(I[:, i])
+        High, HighIndex = findmax(I[:, i])
+        Width = High - Low
+        I[:, i] = broadcast(-, I[:, i], Low)
+        I[:, i] = broadcast(/, I[:, i], Width)
+    end
+    return I
+end
+################################################################################
 function distance(x::Array{T, 1}, y::Array{T, 1}) where {T<:Number}
     dist = 0.0
     for i in 1:length(x)
@@ -59,12 +71,8 @@ lines = readlines(f);
 close(f)
 N = length(lines)
 FN = length(split(lines[1], ","))
-println(FN)
-#FN = parse(Float64, lineString[1])
-#println(typeof(FN))
 #
 I = Array{Float64, 2}(undef, N, FN - 1)
-println(I[1, 1])
 O = Array{Any}(undef, N)
 for i in 1:N
     lineString = split(lines[i], ",")
@@ -73,7 +81,8 @@ for i in 1:N
     end
     O[i] = lineString[FN]
 end
-n = round(Int64, N / 2)
+I = Normalization(I)
+n = round(Int64, N / 10 * 9)
 R = randperm(N)                                                                 #随机排列
 indX = R[1:n]
 X = I[indX, :]
@@ -85,8 +94,5 @@ z, klabels = apply_kNN(X, x, Y, 10)
 println(z[1:5])
 println(klabels[1:5, :])
 println(y[1:5])
-println(sum(y[1:5] .== z[1:5]))
-println(sum(y .== z) / (N - n))
-#println(z[1:5])
-#println(z[1:5])
+println(sum(y .== z) / (N - n) * 100, '%')
 println("End\n")
